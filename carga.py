@@ -3,17 +3,22 @@ class Carga:
         self.valor = valor
         self.ubicacion = ubicacion
         radio = 30
+        self.radio = radio
         self.canvas = canvas
         self.dibujar(radio)
         
         
-    def dibujar(self,radio,):
+    def dibujar(self,radio = None):
+        if radio == None:
+            radio = self.radio
         x = self.ubicacion[0]
         y = self.ubicacion[1]
-        
         carga_visual = self.canvas.create_oval(x - radio, y - radio, x + radio, y + radio, fill= self.color(), outline="")
+        self.canvas.addtag_withtag("carga", carga_visual) #agregar tag para identificar cargas
         self.carga_visual = carga_visual
         self.tag()
+
+    
 
     def color(self):
         #color_rgb = (255, 0, 0)  # Color rojo en RGB
@@ -43,7 +48,29 @@ class Carga:
     def tag(self):
         self.canvas.tag_bind(self.carga_visual, "<ButtonPress-1>", self.empezar_arrastrar)
         self.canvas.tag_bind(self.carga_visual, "<ButtonRelease-1>", self.dejar_arrastrar)
+
+
+class Cargas_v:
+    def __init__(self,canvas) -> None:
+        self.cargas = []
+        self.canvas = canvas
     
+    def dibujar(self):
+        for carga in self.cargas:
+            carga.dibujar()
+    
+    def agregar_carga(self,valor,posicion):
+       carga = Carga(valor,posicion,self.canvas)
+       self.cargas.append(carga)
+    
+    def limpiar(self):
+        for carga in self.cargas:
+            self.canvas.delete(carga.carga_visual)
+        self.cargas = []
+        self.dibujar()
+
+    def calcular(self):
+        pass
         
     
 
