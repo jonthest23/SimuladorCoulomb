@@ -5,20 +5,34 @@ class Carga:
         radio = 30
         self.radio = radio
         self.canvas = canvas
-        self.dibujar(radio)
+        self.tag = None
+        self.texto = None
         
         
-    def dibujar(self,radio = None):
+    def dibujar(self,radio = None ,id = None):
         if radio == None:
             radio = self.radio
         x = self.ubicacion[0]
         y = self.ubicacion[1]
         carga_visual = self.canvas.create_oval(x - radio, y - radio, x + radio, y + radio, fill= self.color(), outline="")
-        self.canvas.addtag_withtag("carga", carga_visual) #agregar tag para identificar cargas
+        texto = self.canvas.create_text(x, y, text= self.positivoONegativo(), fill="white", font=("Arial", 20)) 
+        self.texto = texto
+        self.canvas.addtag_withtag(f'carga_{id}', carga_visual) #agregar tag para identificar cargas
+        self.canvas.addtag_withtag(f'carga_{id}T', texto) #agregar tag para identificar cargas
+        self.tag = f'carga_{id}'
         self.carga_visual = carga_visual
-        self.tag()
-
-    
+        self.tag_bind()
+        
+    def positivoONegativo(self):
+         if self.valor is not None:
+           if self.valor > 0:
+               return "+"
+           elif self.valor < 0:
+                return "-"
+           else:
+                return "o"
+         else:
+             return "Error"
 
     def color(self):
         #color_rgb = (255, 0, 0)  # Color rojo en RGB
@@ -43,34 +57,85 @@ class Carga:
         y = evento.y
         self.ubicacion = (x,y)
         radio = 30
-        self.canvas.coords(self.carga_visual, x - radio, y - radio, x + radio, y + radio)
+        self.canvas.coords(self.tag, x - radio, y - radio, x + radio, y + radio)
+        self.canvas.coords(f'{self.tag}T', x, y)
     
-    def tag(self):
-        self.canvas.tag_bind(self.carga_visual, "<ButtonPress-1>", self.empezar_arrastrar)
-        self.canvas.tag_bind(self.carga_visual, "<ButtonRelease-1>", self.dejar_arrastrar)
+    def tag_bind(self):
+        self.canvas.tag_bind(self.tag, "<ButtonPress-1>", self.empezar_arrastrar)
+        self.canvas.tag_bind(self.tag, "<ButtonRelease-1>", self.dejar_arrastrar)
+        self.canvas.tag_bind(self.tag + "T", "<ButtonPress-1>", self.empezar_arrastrar)
+        self.canvas.tag_bind(self.tag + "T", "<ButtonRelease-1>", self.dejar_arrastrar)
+
+
+
+    def update_tag(self,id = None):
+        self.tag = f'carga_{id}'
+        self.canvas.addtag_withtag(f'carga_{id}', self.carga_visual) #agregar tag para identificar cargas
+        self.canvas.addtag_withtag(f'carga_{id}T', self.texto) #agregar tag para identificar cargas
+    def delete_tag(self):
+        self.canvas.delete(self.tag)
+        self.canvas.delete(f'{self.tag}T')
 
 
 class Cargas_v:
     def __init__(self,canvas) -> None:
-        self.cargas = []
         self.canvas = canvas
+        self.cargas = []
     
     def dibujar(self):
         for carga in self.cargas:
-            carga.dibujar()
+            carga.delete_tag()
+        #update tags
+        for carga in self.cargas:
+            carga.update_tag(self.cargas.index(carga))
+
+        for carga in self.cargas:
+            if carga.tag not in self.canvas.find_all():
+                carga.dibujar(id = self.cargas.index(carga))
+
     
     def agregar_carga(self,valor,posicion):
-       carga = Carga(valor,posicion,self.canvas)
-       self.cargas.append(carga)
+         carga = Carga(valor,posicion,self.canvas)
+         #poner logitud del array
+         posicion = len(self.cargas)
+         carga.dibujar(id = posicion)
+         self.cargas.append(carga)
     
     def limpiar(self):
         for carga in self.cargas:
-            self.canvas.delete(carga.carga_visual)
+            self.canvas.delete(f"carga_{self.cargas.index(carga)}")
         self.cargas = []
-        self.dibujar()
 
     def calcular(self):
         pass
+    def eliminar_carga(self,tag):
+        tag1= self.arreglar_tags(tag)
+        for carga in self.cargas:
+            #si tag comienza con carga 
+            if f"carga_{self.cargas.index(carga)}" == tag1:
+                self.cargas.remove(carga)
+                self.canvas.delete(tag1)
+                break
+        self.dibujar()
+
+    def obtener_valor_Tag(self,tag):
+        tag1 = self.arreglar_tags(tag)
+        for carga in self.cargas:
+            if f"carga_{self.cargas.index(carga)}" == tag1:
+                return carga.valor
+            
+    def editar_valor(self,tag,valor):
+        tag1= self.arreglar_tags(tag)
+        for carga in self.cargas:
+            if f"carga_{self.cargas.index(carga)}" == tag1:
+                carga.valor = int(valor)
+                break
+        self.dibujar()
+    
+    def arreglar_tags(self,tag):
+        if tag.endswith("T"):
+            tag = tag[:-1]
+        return tag
         
     
 
