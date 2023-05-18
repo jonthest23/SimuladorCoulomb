@@ -1,12 +1,16 @@
+from vector import dibujo_vector
+from calculos import calculos_cargas
+
 class Carga:
     def __init__(self,valor,ubicacion,canvas) -> None:  # la creacion de la carga implica un valor en coulomb y una ubicacion en el canvas, y canvas
         self.valor = valor
         self.ubicacion = ubicacion
-        radio = 30
-        self.radio = radio
+        RADIO = 20
+        self.radio = RADIO
         self.canvas = canvas
         self.tag = None
         self.texto = None
+        self.vector = dibujo_vector(self.canvas,self.tag)
         
         
     def dibujar(self,radio = None ,id = None):
@@ -47,6 +51,7 @@ class Carga:
 
 
     def empezar_arrastrar(self,evento):
+
         self.canvas.bind("<B1-Motion>", self.arrastrar)
     
     def dejar_arrastrar(self,evento):
@@ -56,7 +61,7 @@ class Carga:
         x = evento.x
         y = evento.y
         self.ubicacion = (x,y)
-        radio = 30
+        radio = self.radio
         self.canvas.coords(self.tag, x - radio, y - radio, x + radio, y + radio)
         self.canvas.coords(f'{self.tag}T', x, y)
     
@@ -72,9 +77,19 @@ class Carga:
         self.tag = f'carga_{id}'
         self.canvas.addtag_withtag(f'carga_{id}', self.carga_visual) #agregar tag para identificar cargas
         self.canvas.addtag_withtag(f'carga_{id}T', self.texto) #agregar tag para identificar cargas
+        self.vector.actualizar_tag(self.tag)
     def delete_tag(self):
         self.canvas.delete(self.tag)
         self.canvas.delete(f'{self.tag}T')
+        self.vector.borrar_vector()
+
+    
+    def anadir_vector(self,fin):
+        self.vector.definir_vector(fin,self.ubicacion,self.tag,self.canvas)
+    
+    def borrar_vector(self):
+            self.vector.borrar_vector()
+    
 
 
 class Cargas_v:
@@ -100,14 +115,17 @@ class Cargas_v:
          posicion = len(self.cargas)
          carga.dibujar(id = posicion)
          self.cargas.append(carga)
+         self.borrarvectores()
     
     def limpiar(self):
         for carga in self.cargas:
-            self.canvas.delete(f"carga_{self.cargas.index(carga)}")
+            carga.delete_tag()
         self.cargas = []
 
     def calcular(self):
-        pass
+        calculos_cargas().calcular_fuerzas(self.cargas)
+        
+
     def eliminar_carga(self,tag):
         tag1= self.arreglar_tags(tag)
         for carga in self.cargas:
@@ -115,6 +133,8 @@ class Cargas_v:
             if f"carga_{self.cargas.index(carga)}" == tag1:
                 self.cargas.remove(carga)
                 self.canvas.delete(tag1)
+                self.canvas.delete(tag1 + "T")
+                self.canvas.delete(f'vector_{tag1}')
                 break
         self.dibujar()
 
@@ -128,15 +148,20 @@ class Cargas_v:
         tag1= self.arreglar_tags(tag)
         for carga in self.cargas:
             if f"carga_{self.cargas.index(carga)}" == tag1:
+                cargaaurreglar = carga
                 carga.valor = int(valor)
                 break
-        self.dibujar()
+        cargaaurreglar.delete_tag()
+        cargaaurreglar.dibujar(id = self.cargas.index(cargaaurreglar))
     
     def arreglar_tags(self,tag):
         if tag.endswith("T"):
             tag = tag[:-1]
         return tag
         
+    def borrarvectores(self,event = None):
+        for carga in self.cargas:
+            carga.borrar_vector()
     
 
         

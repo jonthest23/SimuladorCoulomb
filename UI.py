@@ -1,5 +1,5 @@
 import tkinter as tk
-from carga import Carga, Cargas_v
+from carga import Cargas_v
 
 class UI:
     def __init__(self):
@@ -79,7 +79,7 @@ class UI:
             ubicacion = [10,event.height - 90]
         return ubicacion
     
-    def click_izquierdo_menu(self, event):
+    def click_derecho_menu(self, event):
         self.ocultar_frame()
         menu = tk.Menu(self.ventana, tearoff=0)
         menu.add_command(label="Agregar carga", command=lambda: self.cargas_v.agregar_carga(0, (event.x, event.y)))
@@ -95,9 +95,18 @@ class UI:
         
     def draw_grid(self, width, height, cell_size, color):
         for y in range(0, height, cell_size):
-            self.canvas.create_line(0, y, width, y, fill=color)
+            if y % 100 == 0:
+                thickness = 2
+            else:
+                thickness = 1
+                
+            self.canvas.create_line(0, y, width, y, fill=color , width=thickness)
         for x in range(0, width, cell_size):
-            self.canvas.create_line(x, 0, x, height, fill=color)
+            if x % 100 == 0:
+                thickness = 2
+            else:
+                thickness = 1
+            self.canvas.create_line(x, 0, x, height, fill=color,width=thickness )
 
     
     def resize_grid(self, event):
@@ -109,23 +118,25 @@ class UI:
         valor = self.miframe.input.get()
         self.cargas_v.editar_valor(self.carga_seleccionada,valor)
 
+    def click_izquierdo(self, event):
+        self.ocultar_frame(event)
+        self.cargas_v.borrarvectores(event)
+
     def run(self):
-        self.crear_ventana("Movimiento de Carga", 990, 440)
+        self.crear_ventana("Simulador de Coulomb", 990, 440)
         self.cargas_v = Cargas_v(self.canvas)
         self.crear_frame_valor("Ingrese valor", "lightgray")
         self.crear_menu()
-        self.anadir_opcion("Calcular", self.on_button_click)
+        self.anadir_opcion("Calcular", self.cargas_v.calcular)
         self.anadir_opcion("Limpiar", self.cargas_v.limpiar)
         self.canvas.bind("<Configure>", self.resize_grid)
         self.ventana.bind("<Configure>", self.ocultar_frame)
-        self.canvas.bind("<Button-1>", self.ocultar_frame)
-        self.canvas.bind("<Button-3>", self.click_izquierdo_menu)
+        self.canvas.bind("<Button-3>", self.click_derecho_menu)
+        self.canvas.bind("<ButtonPress-1>", self.click_izquierdo)
         self.miframe.input.bind("<Return>", self.entervalorcarga)
         self.draw_grid(990, 440, 20, "lightgray")
         self.ventana.mainloop()
 
-    def on_button_click(self):
-        print("calcular")
 
 
 ui = UI()
