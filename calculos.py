@@ -1,4 +1,4 @@
-from math import sqrt,sin,cos , atan2, pi
+from math import sqrt,sin,cos,atan2
 
 class calculos_cargas:
        
@@ -11,28 +11,22 @@ class calculos_cargas:
         pass
 
     def calcular_fuerzas(self,cargas):
-        x_fuerza = 0
-        y_fuerza = 0
-        for carga in cargas:
+        for cargaaCalcular in cargas:
             x_fuerza = 0
             y_fuerza = 0
-            for carga2 in cargas:
-                if self.esDiferenteUbicacion(carga.ubicacion,carga2.ubicacion) == True:
-                    distancia = self.calcular_distancia(carga.ubicacion,carga2.ubicacion)
-                    angulo = self.calcular_angulo(carga.ubicacion,carga2.ubicacion)
-                    fuerza = self.CONSTANTE_COULOMB * (abs(carga2.valor * self.MULTIPLICADOR_COULOMB )
-                          *abs(carga.valor * self.MULTIPLICADOR_COULOMB))/(distancia**2)
-                    y_fuerza += (fuerza*sin(angulo))*self.sumarorestar(carga.valor,carga2.valor,carga.ubicacion[1],carga2.ubicacion[1])
-                    x_fuerza += (fuerza*cos(angulo))*self.sumarorestar(carga.valor,carga2.valor,carga.ubicacion[0],carga2.ubicacion[0])
-                x_fuerza += 0
-                y_fuerza += 0
-            x_fuerzas = self.fuerzaaPixels(x_fuerza)
-            y_fuerzas = self.fuerzaaPixels(y_fuerza)
-            fuerza = round(sqrt(x_fuerzas**2 + y_fuerzas**2),2)
-            carga.vector.valor = fuerza
-            carga.vector.definir_vector((x_fuerzas,y_fuerzas),carga.ubicacion)
-            
-            
+            for cargaEfectora in cargas:
+                if self.esDiferenteUbicacion(cargaaCalcular.ubicacion,cargaEfectora.ubicacion) == True:
+                    distancia = self.calcular_distancia(cargaaCalcular.ubicacion,cargaEfectora.ubicacion)
+                    angulo = self.calcular_angulo(cargaaCalcular.ubicacion,cargaEfectora.ubicacion)
+                    fuerza = self.CONSTANTE_COULOMB * ((cargaEfectora.valor * self.MULTIPLICADOR_COULOMB) 
+                                                       * (cargaaCalcular.valor * self.MULTIPLICADOR_COULOMB) /(distancia**2))
+                    print(fuerza)
+                    y_fuerza += (fuerza*sin(angulo))*self.sumarorestar(cargaaCalcular.ubicacion[1],cargaEfectora.ubicacion[1])
+                    x_fuerza += (fuerza*cos(angulo))*self.sumarorestar(cargaaCalcular.ubicacion[0],cargaEfectora.ubicacion[0])
+
+            fuerza = round(sqrt(x_fuerza**2 + y_fuerza**2),5)
+            cargaaCalcular.vector.valor = fuerza
+            cargaaCalcular.definir_fuerza_vector((x_fuerza,y_fuerza))  
         
     def calcular_distancia(self,ubicacion1,ubicacion2):
 
@@ -40,8 +34,8 @@ class calculos_cargas:
         y_1 = ubicacion1[1]
         x = ubicacion2[0]
         y = ubicacion2[1]
-        x_diferencia = self.pixelAmetros(abs(x_1 - x))
-        y_diferencia = self.pixelAmetros(abs(y_1 - y))
+        x_diferencia = self.pixelAmetros(x_1 - x)
+        y_diferencia = self.pixelAmetros(y_1 - y)
         distancia = sqrt( x_diferencia**2 + y_diferencia** 2)
         return distancia
     
@@ -68,32 +62,14 @@ class calculos_cargas:
             return False
     
     def fuerzaaPixels(self,fuerza):
-        print(round(fuerza*self.MULTIPLICADOR_VECTOR))
         return round(fuerza*self.MULTIPLICADOR_VECTOR)
         
-    
-    def esNegativalaDiferencia(self,valor1,valor2):
-        if valor1 > valor2:
-            return True
-        else:
-            return False
-    def sonMismoSigno(self,valor1,valor2):
-        if valor1 > 0 and valor2 > 0:
-            return True
-        elif valor1 < 0 and valor2 < 0:
-            return True
-        else:
-            return False
+    def sumarorestar(self,posicion1,posicion2):
+        if posicion1 > posicion2:
+            return 1
+        elif  posicion1 < posicion2:
+            return -1
         
-    def sumarorestar(self,valor1,valor2,posicion1,posicion2):
-        if self.sonMismoSigno(valor1,valor2) == True and posicion1 > posicion2:
-            return 1
-        elif self.sonMismoSigno(valor1,valor2) == True and posicion1 < posicion2:
-            return -1
-        elif self.sonMismoSigno(valor1,valor2) == False and posicion1 > posicion2:
-            return -1
-        elif self.sonMismoSigno(valor1,valor2) == False and posicion1 < posicion2:
-            return 1
 
 
          

@@ -1,4 +1,5 @@
 import tkinter as tk
+from vector import dibujo_vector
 from carga import Cargas_v
 
 class UI:
@@ -10,6 +11,8 @@ class UI:
         self.barra_menu = None
         self.mostrar = False
         self.carga_seleccionada = None
+        self.mostrar_distancia = None
+        
 
 
     def crear_ventana(self, titulo, ancho, alto, color="white"):
@@ -18,6 +21,8 @@ class UI:
         ventana.geometry(f"{ancho}x{alto}")
         self.ventana = ventana
         self.crear_canvas(color)
+        self.mostrar_distancia = tk.IntVar()
+        self.mostrar_distancia.set(1)
     
     def crear_canvas(self, color):
         canvas = tk.Canvas(self.ventana, bg=color)
@@ -41,6 +46,9 @@ class UI:
     
     def anadir_opcion(self, label, command):
         self.barra_menu.add_command(label=label, command=command)
+
+    def anadir_checkboton(self, label, variable, command):
+        self.barra_menu.add_checkbutton(label=label, variable=variable , command = command)
     
     def ocultar_frame(self, event = None , mostrar = False):
         if mostrar != self.mostrar:
@@ -121,6 +129,22 @@ class UI:
     def click_izquierdo(self, event):
         self.ocultar_frame(event)
         self.cargas_v.borrarvectores(event)
+        if self.mostrar_distancia.get() == 0:
+            self.cargas_v.seleccionardistancia(event)
+            
+    def checkboton(self):
+        if self.mostrar_distancia.get() == 1:
+            self.barra_menu.entryconfig("Ocultar Distancia", label="Mostrar Distancia")
+            
+            # Obtener todos los elementos en el lienzo
+            elementos = self.canvas.find_all()
+            
+            # Eliminar los elementos con tags que comienzan con "vectordistancia_"
+            dibujo_vector(self.canvas).eliminar_vector_distancia()
+        else:
+            self.barra_menu.entryconfig("Mostrar Distancia", label="Ocultar Distancia")
+            self.cargas_v.carga_seleccionada.clear()
+
 
     def run(self):
         self.crear_ventana("Simulador de Coulomb", 990, 440)
@@ -129,6 +153,7 @@ class UI:
         self.crear_menu()
         self.anadir_opcion("Calcular", self.cargas_v.calcular)
         self.anadir_opcion("Limpiar", self.cargas_v.limpiar)
+        self.anadir_checkboton("Mostrar Distancia", self.mostrar_distancia ,self.checkboton)
         self.canvas.bind("<Configure>", self.resize_grid)
         self.ventana.bind("<Configure>", self.ocultar_frame)
         self.canvas.bind("<Button-3>", self.click_derecho_menu)

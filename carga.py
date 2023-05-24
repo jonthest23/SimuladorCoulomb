@@ -5,8 +5,7 @@ class Carga:
     def __init__(self,valor,ubicacion,canvas) -> None:  # la creacion de la carga implica un valor en coulomb y una ubicacion en el canvas, y canvas
         self.valor = valor
         self.ubicacion = ubicacion
-        RADIO = 20
-        self.radio = RADIO
+        self.radio = 20
         self.canvas = canvas
         self.tag = None
         self.texto = None
@@ -49,7 +48,6 @@ class Carga:
             color = "grey"
         return color
 
-
     def empezar_arrastrar(self,evento):
 
         self.canvas.bind("<B1-Motion>", self.arrastrar)
@@ -71,18 +69,16 @@ class Carga:
         self.canvas.tag_bind(self.tag + "T", "<ButtonPress-1>", self.empezar_arrastrar)
         self.canvas.tag_bind(self.tag + "T", "<ButtonRelease-1>", self.dejar_arrastrar)
 
-
-
     def update_tag(self,id = None):
         self.tag = f'carga_{id}'
         self.canvas.addtag_withtag(f'carga_{id}', self.carga_visual) #agregar tag para identificar cargas
         self.canvas.addtag_withtag(f'carga_{id}T', self.texto) #agregar tag para identificar cargas
         self.vector.actualizar_tag(self.tag)
+   
     def delete_tag(self):
         self.canvas.delete(self.tag)
         self.canvas.delete(f'{self.tag}T')
         self.vector.borrar_vector()
-
     
     def anadir_vector(self,fin):
         self.vector.definir_vector(fin,self.ubicacion,self.tag,self.canvas)
@@ -90,12 +86,17 @@ class Carga:
     def borrar_vector(self):
             self.vector.borrar_vector()
     
-
+    def definir_fuerza_vector(self,fin):
+        extra = [0,0]
+        extra [0] = calculos_cargas().fuerzaaPixels(fin[0]) #fuerza en x
+        extra [1] = calculos_cargas().fuerzaaPixels(fin[1]) #fuerza en y
+        self.vector.definir_vector(extra,self.ubicacion)
 
 class Cargas_v:
     def __init__(self,canvas) -> None:
         self.canvas = canvas
         self.cargas = []
+        self.carga_seleccionada = []
     
     def dibujar(self):
         for carga in self.cargas:
@@ -121,6 +122,7 @@ class Cargas_v:
         for carga in self.cargas:
             carga.delete_tag()
         self.cargas = []
+        dibujo_vector(self.canvas).eliminar_vector_distancia()
 
     def calcular(self):
         calculos_cargas().calcular_fuerzas(self.cargas)
@@ -162,6 +164,28 @@ class Cargas_v:
     def borrarvectores(self,event = None):
         for carga in self.cargas:
             carga.borrar_vector()
+        
     
+    def seleccionardistancia(self, event):
+        if len(self.carga_seleccionada) < 2:
+            tags = event.widget.gettags("current")
+            for tag in tags:
+                if tag.startswith("carga"):
+                     if tag.endswith("T"):
+                         tag = tag[:-1]
+                index = int(tag[6:])
+                self.carga_seleccionada.append(self.cargas[index])
+                break
+                if len(self.carga_seleccionada) == 1:
+                    print("Seleccione otra carga")
+        if len(self.carga_seleccionada) == 2:
+            self.dibujardistancia()
+            
+    def dibujardistancia(self):
+        tag = f"{self.cargas.index(self.carga_seleccionada[0])}_{self.cargas.index(self.carga_seleccionada[1])}"
+        dibujo_vector(self.canvas,tag).dibujar_vector_distancia(self.carga_seleccionada[0].ubicacion,self.carga_seleccionada[1].ubicacion)
+        
 
+
+        
         
