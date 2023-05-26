@@ -20,7 +20,6 @@ class calculos_cargas:
                     angulo = self.calcular_angulo(cargaaCalcular.ubicacion,cargaEfectora.ubicacion)
                     fuerza = self.CONSTANTE_COULOMB * ((cargaEfectora.valor * self.MULTIPLICADOR_COULOMB) 
                                                        * (cargaaCalcular.valor * self.MULTIPLICADOR_COULOMB) /(distancia**2))
-                    print(fuerza)
                     y_fuerza += (fuerza*sin(angulo))*self.sumarorestar(cargaaCalcular.ubicacion[1],cargaEfectora.ubicacion[1])
                     x_fuerza += (fuerza*cos(angulo))*self.sumarorestar(cargaaCalcular.ubicacion[0],cargaEfectora.ubicacion[0])
 

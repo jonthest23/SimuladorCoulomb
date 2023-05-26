@@ -32,10 +32,10 @@ class UI:
     def crear_frame_valor(self, texto, color):
         miframe = tk.Frame()
         miframe.config(bg=color)
-        label = tk.Label(miframe, text=texto, bg=color)
-        label.pack(padx=10, pady=5)
-        miframe.input = tk.Entry(miframe)
-        miframe.input.pack(padx=10, pady=10)
+        label = tk.Label(miframe, text=texto, bg=color,font=("Arial", 12))
+        label.pack(padx=6, pady= 2)
+        miframe.input = tk.Entry(miframe, borderwidth=2, highlightthickness=2, justify="center")
+        miframe.input.pack(padx=6, pady = 4)
         self.miframe = miframe
         
     
@@ -97,7 +97,6 @@ class UI:
                 self.carga_seleccionada = tag
                 menu.add_command(label="Modificar valor", command= lambda: self.ocultar_frame(mostrar=True))
                 menu.add_command(label="Eliminar", command=lambda: self.cargas_v.eliminar_carga(tag))
-                print(tag)
                 break
         menu.tk_popup(event.x_root, event.y_root)
         
@@ -149,7 +148,7 @@ class UI:
     def run(self):
         self.crear_ventana("Simulador de Coulomb", 990, 440)
         self.cargas_v = Cargas_v(self.canvas)
-        self.crear_frame_valor("Ingrese valor", "lightgray")
+        self.crear_frame_valor("Ingrese valor en µC", "lightgray")
         self.crear_menu()
         self.anadir_opcion("Calcular", self.cargas_v.calcular)
         self.anadir_opcion("Limpiar", self.cargas_v.limpiar)

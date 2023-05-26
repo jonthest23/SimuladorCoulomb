@@ -5,7 +5,7 @@ class Carga:
     def __init__(self,valor,ubicacion,canvas) -> None:  # la creacion de la carga implica un valor en coulomb y una ubicacion en el canvas, y canvas
         self.valor = valor
         self.ubicacion = ubicacion
-        self.radio = 20
+        self.radio = 25
         self.canvas = canvas
         self.tag = None
         self.texto = None
@@ -18,7 +18,7 @@ class Carga:
         x = self.ubicacion[0]
         y = self.ubicacion[1]
         carga_visual = self.canvas.create_oval(x - radio, y - radio, x + radio, y + radio, fill= self.color(), outline="")
-        texto = self.canvas.create_text(x, y, text= self.positivoONegativo(), fill="white", font=("Arial", 20)) 
+        texto = self.canvas.create_text(x, y, text= f'{self.positivoONegativo()}µC', fill="white", font=("Arial Bold", 13)) 
         self.texto = texto
         self.canvas.addtag_withtag(f'carga_{id}', carga_visual) #agregar tag para identificar cargas
         self.canvas.addtag_withtag(f'carga_{id}T', texto) #agregar tag para identificar cargas
@@ -27,15 +27,16 @@ class Carga:
         self.tag_bind()
         
     def positivoONegativo(self):
-         if self.valor is not None:
-           if self.valor > 0:
-               return "+"
-           elif self.valor < 0:
-                return "-"
-           else:
-                return "o"
-         else:
-             return "Error"
+        valor = 'e'
+        if self.valor is not None:
+            if len(str(self.valor) ) > 3:
+                valor = str(self.valor)[:3]
+            else:
+                valor = str(self.valor)
+        return valor
+                
+        
+            
 
     def color(self):
         #color_rgb = (255, 0, 0)  # Color rojo en RGB
@@ -49,11 +50,13 @@ class Carga:
         return color
 
     def empezar_arrastrar(self,evento):
-
         self.canvas.bind("<B1-Motion>", self.arrastrar)
+        dibujo_vector(self.canvas).eliminar_vector_distancia()
+        
     
     def dejar_arrastrar(self,evento):
         self.canvas.unbind("<B1-Motion>")
+        
 
     def arrastrar(self,evento):
         x = evento.x
@@ -171,16 +174,16 @@ class Cargas_v:
             tags = event.widget.gettags("current")
             for tag in tags:
                 if tag.startswith("carga"):
-                     if tag.endswith("T"):
+                    if tag.endswith("T"):
                          tag = tag[:-1]
-                index = int(tag[6:])
-                self.carga_seleccionada.append(self.cargas[index])
-                break
+                    index = int(tag[6:])
+                    self.carga_seleccionada.append(self.cargas[index])
+                    break
                 if len(self.carga_seleccionada) == 1:
                     print("Seleccione otra carga")
         if len(self.carga_seleccionada) == 2:
             self.dibujardistancia()
-            
+            self.carga_seleccionada = []
     def dibujardistancia(self):
         tag = f"{self.cargas.index(self.carga_seleccionada[0])}_{self.cargas.index(self.carga_seleccionada[1])}"
         dibujo_vector(self.canvas,tag).dibujar_vector_distancia(self.carga_seleccionada[0].ubicacion,self.carga_seleccionada[1].ubicacion)

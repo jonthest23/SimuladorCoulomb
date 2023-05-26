@@ -26,11 +26,23 @@ class dibujo_vector:
             self.canvas.addtag_withtag(self.tagtext, text)
       pass
 
+    def posicion_texto_dis(self,fin,inicio):
+        if inicio[0] > fin[0] and inicio[1] > fin[1]:
+                ubicacion_texto = (fin[0] + abs(inicio[0]-fin[0])/2, fin[1] + abs(inicio[1]-fin[1])/2 + 10)
+        elif inicio[0] > fin[0] and inicio[1] < fin[1]:
+                ubicacion_texto = (fin[0] + abs(inicio[0]-fin[0])/2, fin[1] - abs(inicio[1]-fin[1])/2 - 10)
+        elif inicio[0] < fin[0] and inicio[1] > fin[1]:
+                ubicacion_texto = (fin[0] - abs(inicio[0]-fin[0])/2, fin[1] + abs(inicio[1]-fin[1])/2 + 10)
+        elif inicio[0] < fin[0] and inicio[1] < fin[1]:
+                ubicacion_texto = (fin[0] - abs(inicio[0]-fin[0])/2, fin[1] - abs(inicio[1]-fin[1])/2 - 10)
+        return ubicacion_texto
+        
+
     def dibujar_vector_distancia(self,fin,inicio):
         if self.finEIniciodiferentes(fin,inicio) == True:
             vector = self.canvas.create_line(inicio[0],inicio[1],fin[0],fin[1],fill="grey",width =3)
             texto = str(calculos_cargas().calcular_distancia(fin,inicio))
-            ubicacion_texto = (inicio[0] + abs(inicio[0]-fin[0])/2, inicio[1] + abs(inicio[1]-fin[1])/2 + 10)
+            ubicacion_texto = self.posicion_texto_dis(fin,inicio)
             text = self.canvas.create_text(ubicacion_texto[0],ubicacion_texto[1],text =f'{texto} m',fill="black", font = ('Arial', 12))
             self.tagtext = f'vectordistancia_{self.tag}T'
             self.tag = f'vectordistancia_{self.tag}'
