@@ -1,6 +1,7 @@
 import tkinter as tk
 from vector import dibujo_vector
 from carga import Cargas_v
+from math import sqrt
 
 class UI:
     def __init__(self):
@@ -143,6 +144,16 @@ class UI:
         else:
             self.barra_menu.entryconfig("Mostrar Distancia", label="Ocultar Distancia")
             self.cargas_v.carga_seleccionada.clear()
+ 
+    def aumentar_vector(self):
+        multiplicador = self.cargas_v.Calculos.multiplicador_vector 
+        self.cargas_v.Calculos.multiplicador_vector = multiplicador * sqrt(10)
+        self.cargas_v.dibujar()
+    
+    def disminuir_vector(self):
+        multiplicador = self.cargas_v.Calculos.multiplicador_vector 
+        self.cargas_v.Calculos.multiplicador_vector = multiplicador / sqrt(10)
+        self.cargas_v.dibujar()
 
 
     def run(self):
@@ -153,6 +164,8 @@ class UI:
         self.anadir_opcion("Calcular", self.cargas_v.calcular)
         self.anadir_opcion("Limpiar", self.cargas_v.limpiar)
         self.anadir_checkboton("Mostrar Distancia", self.mostrar_distancia ,self.checkboton)
+        self.anadir_opcion("Aumentar Vector", self.aumentar_vector)
+        self.anadir_opcion("Disminuir Vector", self.disminuir_vector)
         self.canvas.bind("<Configure>", self.resize_grid)
         self.ventana.bind("<Configure>", self.ocultar_frame)
         self.canvas.bind("<Button-3>", self.click_derecho_menu)

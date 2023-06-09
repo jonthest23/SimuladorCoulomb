@@ -6,7 +6,6 @@ class dibujo_vector:
         self.tagcarga = tag
         self.canvas = canvas
         self.valor = None
-        self.tagtext = None
         pass
 
     def actualizar_tag(self,tag):
@@ -20,10 +19,10 @@ class dibujo_vector:
       if self.finEIniciodiferentes(fin,inicio) == True:
             vector = self.canvas.create_line(inicio[0],inicio[1],fin[0],fin[1],fill="grey",arrow=tk.LAST, width =4)
             text = self.canvas.create_text(posicion_texto[0],posicion_texto[1],text =f'{self.valor}N',fill="black", font = ('Arial', 12))
-            self.tagtext = f'vector_{self.tagcarga}T'
+            tagtext = f'vector_{self.tagcarga}T'
             self.tag = f'vector_{self.tagcarga}'
             self.canvas.addtag_withtag(self.tag, vector)
-            self.canvas.addtag_withtag(self.tagtext, text)
+            self.canvas.addtag_withtag(tagtext, text)
       pass
 
     def posicion_texto_dis(self,fin,inicio):
@@ -41,13 +40,15 @@ class dibujo_vector:
     def dibujar_vector_distancia(self,fin,inicio):
         if self.finEIniciodiferentes(fin,inicio) == True:
             vector = self.canvas.create_line(inicio[0],inicio[1],fin[0],fin[1],fill="grey",width =3)
-            texto = str(calculos_cargas().calcular_distancia(fin,inicio))
+            texto = calculos_cargas().calcular_distancia(fin,inicio)
+            print(texto)
+            texto = str(round(texto,4))
             ubicacion_texto = self.posicion_texto_dis(fin,inicio)
             text = self.canvas.create_text(ubicacion_texto[0],ubicacion_texto[1],text =f'{texto} m',fill="black", font = ('Arial', 12))
-            self.tagtext = f'vectordistancia_{self.tag}T'
+            tagtext = f'vectordistancia_{self.tag}T'
             self.tag = f'vectordistancia_{self.tag}'
             self.canvas.addtag_withtag(self.tag, vector)
-            self.canvas.addtag_withtag(self.tagtext, text)
+            self.canvas.addtag_withtag(tagtext, text)
         pass
 
     def eliminar_vector_distancia(self):
@@ -64,7 +65,7 @@ class dibujo_vector:
     def borrar_vector(self):
         if self.tag is not None:
             self.canvas.delete(self.tag)
-            self.canvas.delete(self.tagtext)
+            self.canvas.delete(f'{self.tag}T')
             self.tag = None
             self.valor = None
         pass

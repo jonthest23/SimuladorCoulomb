@@ -2,7 +2,7 @@ from vector import dibujo_vector
 from calculos import calculos_cargas
 
 class Carga:
-    def __init__(self,valor,ubicacion,canvas) -> None:  # la creacion de la carga implica un valor en coulomb y una ubicacion en el canvas, y canvas
+    def __init__(self,valor,ubicacion,canvas,calculos) -> None:  # la creacion de la carga implica un valor en coulomb y una ubicacion en el canvas, y canvas
         self.valor = valor
         self.ubicacion = ubicacion
         self.radio = 25
@@ -10,6 +10,7 @@ class Carga:
         self.tag = None
         self.texto = None
         self.vector = dibujo_vector(self.canvas,self.tag)
+        self.calculos = calculos
         
         
     def dibujar(self,radio = None ,id = None):
@@ -18,7 +19,7 @@ class Carga:
         x = self.ubicacion[0]
         y = self.ubicacion[1]
         carga_visual = self.canvas.create_oval(x - radio, y - radio, x + radio, y + radio, fill= self.color(), outline="")
-        texto = self.canvas.create_text(x, y, text= f'{self.positivoONegativo()}µC', fill="white", font=("Arial Bold", 13)) 
+        texto = self.canvas.create_text(x, y, text= f'{self.positivoONegativo()}µC', fill="white", font=("Arial Bold", 11)) 
         self.texto = texto
         self.canvas.addtag_withtag(f'carga_{id}', carga_visual) #agregar tag para identificar cargas
         self.canvas.addtag_withtag(f'carga_{id}T', texto) #agregar tag para identificar cargas
@@ -31,6 +32,7 @@ class Carga:
         if self.valor is not None:
             if len(str(self.valor) ) > 3:
                 valor = str(self.valor)[:3]
+                valor = valor + '+'
             else:
                 valor = str(self.valor)
         return valor
@@ -91,8 +93,8 @@ class Carga:
     
     def definir_fuerza_vector(self,fin):
         extra = [0,0]
-        extra [0] = calculos_cargas().fuerzaaPixels(fin[0]) #fuerza en x
-        extra [1] = calculos_cargas().fuerzaaPixels(fin[1]) #fuerza en y
+        extra [0] = self.calculos.fuerzaaPixels(fin[0]) #fuerza en x
+        extra [1] = self.calculos.fuerzaaPixels(fin[1]) #fuerza en y
         self.vector.definir_vector(extra,self.ubicacion)
 
 class Cargas_v:
@@ -100,6 +102,7 @@ class Cargas_v:
         self.canvas = canvas
         self.cargas = []
         self.carga_seleccionada = []
+        self.Calculos = calculos_cargas()
     
     def dibujar(self):
         for carga in self.cargas:
@@ -114,7 +117,7 @@ class Cargas_v:
 
     
     def agregar_carga(self,valor,posicion):
-         carga = Carga(valor,posicion,self.canvas)
+         carga = Carga(valor,posicion,self.canvas,self.Calculos)
          #poner logitud del array
          posicion = len(self.cargas)
          carga.dibujar(id = posicion)
@@ -128,7 +131,7 @@ class Cargas_v:
         dibujo_vector(self.canvas).eliminar_vector_distancia()
 
     def calcular(self):
-        calculos_cargas().calcular_fuerzas(self.cargas)
+        self.Calculos.calcular_fuerzas(self.cargas)
         
 
     def eliminar_carga(self,tag):

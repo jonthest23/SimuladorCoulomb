@@ -6,8 +6,8 @@ class calculos_cargas:
     def __init__(self) -> None:
         self.CONSTANTE_COULOMB =  8.9875517873681764*(10**9)
         self.PIXELES_METRO = 200
-        self.MULTIPLICADOR_COULOMB = 10**-6 #micro culombios
-        self.MULTIPLICADOR_VECTOR = 10**3 #multiplicador para que el vector se vea en la pantalla
+        self.MULTIPLICADOR_COULOMB = 10**-6 
+        self.multiplicador_vector = 10**3 
         pass
 
     def calcular_fuerzas(self,cargas):
@@ -25,7 +25,7 @@ class calculos_cargas:
 
             fuerza = round(sqrt(x_fuerza**2 + y_fuerza**2),5)
             cargaaCalcular.vector.valor = fuerza
-            cargaaCalcular.definir_fuerza_vector((x_fuerza,y_fuerza))  
+            cargaaCalcular.definir_fuerza_vector((x_fuerza,y_fuerza,self.multiplicador_vector))  
         
     def calcular_distancia(self,ubicacion1,ubicacion2):
 
@@ -61,13 +61,18 @@ class calculos_cargas:
             return False
     
     def fuerzaaPixels(self,fuerza):
-        return round(fuerza*self.MULTIPLICADOR_VECTOR)
+        return round(fuerza*self.multiplicador_vector)
         
     def sumarorestar(self,posicion1,posicion2):
         if posicion1 > posicion2:
             return 1
         elif  posicion1 < posicion2:
             return -1
+        
+    def modificarmultiplicador(self,valor):
+        self.multiplicador_vector = valor
+        return self.multiplicador_vector
+
         
 
 
